@@ -12,6 +12,7 @@ private:
 
 public:
     Graph(int v, double satruation);
+    Graph(const std::string& jsonFile);
     void addEdge(int u, int v);
     int getVertices() const;
     // int findShortestPath(int u, int v) const;

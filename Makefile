@@ -4,5 +4,10 @@ compile:
 
 # link:
 
+generate:
+	g++ -Isrc/include -c generatorDanych/generateJson.cpp
+	g++ generateJson.o -o genJson 
+
+
 delete:
 	rm *.o

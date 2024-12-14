@@ -1,20 +1,57 @@
 #include "graph.h"
 #include <limits>
-#include <queue>
+// #include <queue>
 #include <random>
 #include <iostream>
 #include <algorithm> 
 #include <string>
 #include <fstream>  // For file handling
 #include <iomanip> // For random colors
+#include <nlohmann/json.hpp> // Include the JSON library
+#include <fstream>
+#include <stdexcept>
+
 
 using namespace std;
+
+using json = nlohmann::json;
 
 
 void Graph::addEdge(int u, int v) {
     adjMatrix[u][v] = 1;
     adjMatrix[v][u] = 1;
     // cout << "added edge from " << u << " to " << v << endl;
+}
+
+
+
+Graph::Graph(const std::string& jsonFile) {
+    std::ifstream file(jsonFile);
+    if (!file) {
+        throw std::runtime_error("Error: Could not open JSON file " + jsonFile);
+    }
+
+    json j;
+    file >> j; // Parse JSON
+
+    // Check for vertices
+    if (!j.contains("vertices") || !j.contains("edges")) {
+        throw std::runtime_error("Invalid JSON format: missing 'vertices' or 'edges' fields.");
+    }
+
+    // Initialize vertices
+    vertices = j["vertices"];
+    adjMatrix.resize(vertices, std::vector<int>(vertices, 0));
+
+    // Add edges from JSON
+    for (const auto& edge : j["edges"]) {
+        int u = edge[0];
+        int v = edge[1];
+        if (u >= vertices || v >= vertices) {
+            throw std::runtime_error("Invalid edge: vertex out of bounds.");
+        }
+        addEdge(u, v);
+    }
 }
 
 Graph::Graph(int v, double saturation) : vertices(v), adjMatrix(v, vector<int>(v, 0)) {
@@ -41,6 +78,7 @@ Graph::Graph(int v, double saturation) : vertices(v), adjMatrix(v, vector<int>(v
         addEdge(u, v);
     }
 }
+
 
 int Graph::getVertices() const {
     return vertices;
