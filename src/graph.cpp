@@ -24,7 +24,6 @@ void Graph::addEdge(int u, int v) {
 }
 
 
-
 Graph::Graph(const std::string& jsonFile) {
     std::ifstream file(jsonFile);
     if (!file) {
