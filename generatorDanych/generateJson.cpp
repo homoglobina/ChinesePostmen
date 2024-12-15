@@ -45,7 +45,7 @@ int main() {
 
     ofstream outFile("graph.json");
     if (outFile.is_open()) {
-        outFile << graphJson.dump(4); // Pretty print with 4 spaces indentation
+        outFile << graphJson.dump(); // Pretty print with 4 spaces indentation
         outFile.close();
         cout << "Graph saved to graph.json" << endl;
     } else {

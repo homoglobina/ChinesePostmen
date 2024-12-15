@@ -4,11 +4,8 @@
 #include <queue>
 #include <algorithm>
 #include <stack>
-#include <fstream> 
-#include <nlohmann/json.hpp>
 #include "graph.h" // Assuming you have a Graph class defined in graph.h
 
-using json = nlohmann::json;
 using namespace std;
 
 // Greedy Chinese Postman Algorithm
@@ -172,29 +169,6 @@ void ChinesePostman::printRoutes(const vector<vector<int>>& routes) {
         }
         cout << endl;
     }
-
-    // Create a JSON object to store the routes
-    json jsonRoutes;
-
-    // Iterate through the routes and store them in JSON format
-    for (int i = 0; i < routes.size(); ++i) {
-        vector<pair<int, int>> edges; // Collect edges for each route
-        for (size_t j = 0; j < routes[i].size() - 1; ++j) {
-            edges.emplace_back(routes[i][j], routes[i][j + 1]);
-        }
-
-        // Add the route's edges to the JSON object
-        jsonRoutes["postman_" + to_string(i + 1)] = edges;
-    }
-
-    std::ofstream outFile("postman_routes.json");
-    if (outFile.is_open()) {
-        outFile << jsonRoutes.dump(); 
-        outFile.close();
-        cout << "Routes saved to 'postman_routes.json'" << endl;
-    } else {
-        cerr << "Error: Could not open file for writing!" << endl;
-    }
 }
 
 
@@ -264,6 +238,13 @@ void ChinesePostman::printRoutesExact(const vector<vector<int>>& routes) {
     printRoutes(routes); // Same logic as in the greedy version
 }
 
+
+
+
+
+
+
+
 void ChinesePostman::findShortestRouteExact() {
 
     // Step 1: Find all odd degree vertices
@@ -288,4 +269,40 @@ void ChinesePostman::findShortestRouteExact() {
     printRoutesExact(routes);
 }
 
-so this code seems to add edges that do not exist to my graph which i do not want, if one postman hops around not connected nodes i do not like that solution, would you fix that
+
+++ *.o -o main -lm -lsfml-graphics -lsfml-window -lsfml-system
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findOddDegreeVertices()':
+Postman.cpp:(.text+0x1ba): multiple definition of `ChinesePostman::findOddDegreeVertices()'; greedyPostman.o:greedyPostman.cpp:(.text+0x1ba): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findShortestPaths(std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0x558): multiple definition of `ChinesePostman::findShortestPaths(std::vector<int, std::allocator<int> > const&)'; greedyPostman.o:greedyPostman.cpp:(.text+0x558): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findMinimumWeightMatching(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0x7a0): multiple definition of `ChinesePostman::findMinimumWeightMatching(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)'; greedyPostman.o:greedyPostman.cpp:(.text+0x7a0): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::addMatchingEdgesToGraph(std::vector<std::pair<int, int>, std::allocator<std::pair<int, int> > > const&, std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0xa88): multiple definition of `ChinesePostman::addMatchingEdgesToGraph(std::vector<std::pair<int, int>, std::allocator<std::pair<int, int> > > const&, std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)'; greedyPostman.o:greedyPostman.cpp:(.text+0xa88): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findEulerianCircuit()':
+Postman.cpp:(.text+0xb42): multiple definition of `ChinesePostman::findEulerianCircuit()'; greedyPostman.o:greedyPostman.cpp:(.text+0xb42): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::splitCircuitAmongPostmen(std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0xdee): multiple definition of `ChinesePostman::splitCircuitAmongPostmen(std::vector<int, std::allocator<int> > const&)'; greedyPostman.o:greedyPostman.cpp:(.text+0xdee): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::printRoutes(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&)':
+Postman.cpp:(.text+0xf5a): multiple definition of `ChinesePostman::printRoutes(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&)'; greedyPostman.o:greedyPostman.cpp:(.text+0xf5a): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findOddDegreeVerticesExact()':
+Postman.cpp:(.text+0x10b8): multiple definition of `ChinesePostman::findOddDegreeVerticesExact()'; exactPostman.o:exactPostman.cpp:(.text+0x1aa): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findShortestPathsExact(std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0x1104): multiple definition of `ChinesePostman::findShortestPathsExact(std::vector<int, std::allocator<int> > const&)'; exactPostman.o:exactPostman.cpp:(.text+0x2ee): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findMinimumCostPerfectMatchingExact(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0x1158): multiple definition of `ChinesePostman::findMinimumCostPerfectMatchingExact(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&, std::vector<int, std::allocator<int> > const&)'; exactPostman.o:exactPostman.cpp:(.text+0x6ec): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::addMatchingEdgesToGraphExact(std::vector<std::pair<int, int>, std::allocator<std::pair<int, int> > > const&)':
+Postman.cpp:(.text+0x1578): multiple definition of `ChinesePostman::addMatchingEdgesToGraphExact(std::vector<std::pair<int, int>, std::allocator<std::pair<int, int> > > const&)'; exactPostman.o:exactPostman.cpp:(.text+0xb0c): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findEulerianCircuitExact()':
+Postman.cpp:(.text+0x162a): multiple definition of `ChinesePostman::findEulerianCircuitExact()'; exactPostman.o:exactPostman.cpp:(.text+0xbbe): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::splitCircuitAmongPostmenExact(std::vector<int, std::allocator<int> > const&)':
+Postman.cpp:(.text+0x1676): multiple definition of `ChinesePostman::splitCircuitAmongPostmenExact(std::vector<int, std::allocator<int> > const&)'; exactPostman.o:exactPostman.cpp:(.text+0xbe0): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::printRoutesExact(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&)':
+Postman.cpp:(.text+0x16ca): multiple definition of `ChinesePostman::printRoutesExact(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > > const&)'; exactPostman.o:exactPostman.cpp:(.text+0xc06): first defined here
+/usr/bin/ld: Postman.o: in function `ChinesePostman::findShortestRouteExact()':
+Postman.cpp:(.text+0x16f0): multiple definition of `ChinesePostman::findShortestRouteExact()'; exactPostman.o:exactPostman.cpp:(.text+0x0): first defined here
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:3: compile] Error 1
+
+
+how would you fix this postman.cpp file

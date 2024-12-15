@@ -1,6 +1,5 @@
 #include "graph.h"
 #include <limits>
-// #include <queue>
 #include <random>
 #include <iostream>
 #include <algorithm> 
@@ -9,8 +8,7 @@
 #include <iomanip> // For random colors
 #include <nlohmann/json.hpp> // Include the JSON library
 #include <fstream>
-#include <stdexcept>
-
+#include <stack>
 
 using namespace std;
 
@@ -78,10 +76,55 @@ Graph::Graph(int v, double saturation) : vertices(v), adjMatrix(v, vector<int>(v
     }
 }
 
+vector<pair<int,int>> Graph::findEuler(){
+    vector<pair<int,int>> eulerCycle;
+    stack<int> stack;
+    vector<vector<int>> localAdjMatrix = adjMatrix; // Make a copy
+
+    stack.push(0); // Start at any vertex
+    while (!stack.empty()) {
+        int u = stack.top();
+        int v = 0;
+        while (v < vertices && localAdjMatrix[u][v] == 0) {
+            v++;
+        }
+        if (v == vertices) {
+            // No more edges from u
+            eulerCycle.emplace_back(u, -1);
+            stack.pop();
+        } else {
+            // Remove edge (u, v)
+            stack.push(v);
+            localAdjMatrix[u][v] = 0;
+            localAdjMatrix[v][u] = 0;
+        }
+    }
+
+    return eulerCycle;
+
+}
+
+
 
 int Graph::getVertices() const {
     return vertices;
 }
+
+bool Graph::isEulerian() const {
+    for (int i = 0; i < vertices; ++i) {
+        int degree = 0;
+        for (int j = 0; j < vertices; ++j) {
+            if (adjMatrix[i][j] > 0) {
+                degree++;
+            }
+        }
+        if (degree % 2 != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 vector<pair<int, int>> Graph::getOddDegreeVertices() const {
     vector<pair<int, int>> oddVertices;

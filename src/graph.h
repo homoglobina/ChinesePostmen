@@ -15,16 +15,23 @@ public:
     Graph(const std::string& jsonFile);
     void addEdge(int u, int v);
     int getVertices() const;
-    // int findShortestPath(int u, int v) const;
     std::vector<std::pair<int, int>> getOddDegreeVertices() const;
     int getEdgeWeight(int u, int v) const;
     const std::vector<std::vector<int>>& getAdjMatrix() const;
-    // void GenerateGraph(int v, int u);
+    bool isEulerian() const;
     void printAdjMatrix();
     void toGraphviz(const std::string& filename) const;
 
+    void solveChinesePostman(int n);
+    void makeGraphEulerian();
+    std::vector<std::pair<int, int>> findEulerCycle();
+    int calculateCycleCost(const std::vector<std::pair<int, int>>& cycle);
+    std::vector<std::pair<int,int>> findEuler();
+
 
 };
+
+
 
 
 #endif // GRAPH_H
