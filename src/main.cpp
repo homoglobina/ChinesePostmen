@@ -14,7 +14,7 @@ int main() {
     if (choice){    // use existing graph
         Graph graph("graph.json");
 
-        graph.printAdjMatrix();
+        // graph.printAdjMatrix();
         graph.toGraphviz("graph.dot");  // Export to Graphviz format
 
         // int x = menu();
@@ -36,7 +36,7 @@ int main() {
         Graph graph(vertices, saturation);
 
 
-        graph.printAdjMatrix();
+        // graph.printAdjMatrix();
         graph.toGraphviz("graph.dot");  // Export to Graphviz format
 
         // int x = menu();

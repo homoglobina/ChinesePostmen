@@ -11,37 +11,105 @@ using namespace std;
 
 void Graph::solveChinesePostman(int n) {
     // Step 1: Make the graph Eulerian
+
+    vector<vector<int>> localAdjMatrix = adjMatrix;
+
     makeGraphEulerian();
 
     // Step 2: Find the Euler cycle
     auto eulerCycle = findEulerCycle();
+    
 
-    // Step 3: Calculate the total cost of the cycle
-    int totalCost = calculateCycleCost(eulerCycle);
-    int avgCostPerPostman = totalCost / n;
 
-    // Step 4: Divide the Euler cycle among `n` postmen
-    vector<vector<pair<int, int>>> postmenRoutes(n); // Routes for each postman
-    int currentCost = 0, postman = 0;
+    cout << "\nEuler0" << ": ";
     for (const auto& edge : eulerCycle) {
-        if (currentCost + getEdgeWeight(edge.first, edge.second) > avgCostPerPostman && postman < n - 1) {
-            postman++; // Move to the next postman
-            currentCost = 0;
+        cout << "(" << edge.second << ", " << edge.first << ") ";
+    }
+    cout << endl;
+
+    // test 
+    vector<pair<int,int>> eulerCycle2;
+    cout << "Euler" << ": ";
+    for (const auto& edge : eulerCycle) {
+        if (localAdjMatrix[edge.second][edge.first] == 0){
+            // if in this loop then delete from eulerCycle the edge that is not in the original graph
+            eulerCycle.erase(std::remove(eulerCycle.begin(), eulerCycle.end(), edge), eulerCycle.end());
+            cout << "deleted";
         }
-        postmenRoutes[postman].push_back(edge); // Assign edge to the current postman's route
-        currentCost += getEdgeWeight(edge.first, edge.second);
+        else{
+            cout << "(" << edge.second << ", " << edge.first << ") ";
+            eulerCycle2.push_back(edge);
+
+        }
     }
 
-    // Step 5: Display routes
+
+    cout << "\nEuler2" << ": ";
+    for (const auto& edge : eulerCycle) {
+        cout << "(" << edge.second << ", " << edge.first << ") ";
+    }
+    cout << endl;
+
+    cout << "\nEulerEND" << ": ";
+    for (const auto& edge : eulerCycle2) {
+        cout << "(" << edge.second << ", " << edge.first << ") ";
+    }
+    cout << endl;
+
+    // Step 3: Split the Euler cycle into `n` connected subpaths
+    int totalEdges = eulerCycle.size();
+    int edgesPerPostman = totalEdges / n;
+    vector<vector<pair<int, int>>> postmenRoutes(n);
+
+    // Split the Eulerian cycle into nearly equal subpaths
+    auto it = eulerCycle.begin();
+    for (int i = 0; i < n; ++i) {
+        int count = 0;
+        while (it != eulerCycle.end() && count < edgesPerPostman) {
+            postmenRoutes[i].push_back(*it);
+            ++it;
+            ++count;
+        }
+    }
+
+    // If there are remaining edges (in case totalEdges isn't divisible evenly), distribute them
+    while (it != eulerCycle.end()) {
+        postmenRoutes[n - 1].push_back(*it);
+        ++it;
+    }
+
+    // Display the routes assigned to postmen
+    int totalCost = 0;
     for (int i = 0; i < n; ++i) {
         cout << "Postman " << i + 1 << ": ";
         for (const auto& edge : postmenRoutes[i]) {
-            cout << "(" << edge.first << ", " << edge.second << ") ";
+            cout << "(" << edge.second << ", " << edge.first << ") ";
         }
         cout << endl;
+        totalCost += calculateCycleCost(postmenRoutes[i]);
     }
+
     cout << "Total cost: " << totalCost << endl;
 }
+
+vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>& dist) {
+    vector<int> path;
+    int current = end;
+    while (current != start) {
+        path.push_back(current);
+        for (int i = 0; i < vertices; ++i) {
+            if (adjMatrix[i][current] > 0 && dist[current] - adjMatrix[i][current] == dist[i]) {
+                current = i;
+                break;
+            }
+        }
+    }
+    path.push_back(start);
+    reverse(path.begin(), path.end());
+    return path;
+}
+
+
 
 void Graph::makeGraphEulerian() {
     // Find vertices with odd degree
