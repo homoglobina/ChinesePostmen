@@ -5,8 +5,12 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <fstream>
+#include <nlohmann/json.hpp> // Include the JSON library
+#include <utility>
 
 
+using json = nlohmann::json;
 using namespace std;
 
 void Graph::solveChinesePostman(int n) {
@@ -59,14 +63,6 @@ void Graph::solveChinesePostman(int n) {
     }
 
 
-
-
-
-
-
-
-
-
     cout << "\nEulerEND" << ": ";
     for (const auto& edge : eulerCycle2) {
         cout << "(" << edge.first << ", " << edge.second << ") ";
@@ -107,9 +103,50 @@ void Graph::solveChinesePostman(int n) {
         cout << endl;
         totalCost += calculateCycleCost(postmenRoutes[i]);
     }
-
     cout << "Total cost: " << totalCost << endl;
+
+
+    json result; // JSON object to store data
+
+    for (int i = 0; i < n; ++i) {
+        json postmanData; // JSON object for each postman's route
+        for (const auto& edge : postmenRoutes[i]) {
+            postmanData.push_back({edge.first, edge.second});
+        }
+        result["postmen"][i] = {
+            {"routes", postmanData},
+            {"cost", calculateCycleCost(postmenRoutes[i])}
+        };
+        totalCost += calculateCycleCost(postmenRoutes[i]);
+    }
+
+    result["totalCost"] = totalCost;
+
+    // Write JSON data to file
+    ofstream file("results.json");
+    if (file.is_open()) {
+        file << result.dump(); // Pretty print with indentation
+        file.close();
+        cout << "Results saved to results.json" << endl;
+    } else {
+        cerr << "Unable to open file for writing." << endl;
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
 
 vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>& dist) {
     vector<int> path;
@@ -172,6 +209,8 @@ int Graph::calculateCycleCost(const std::vector<std::pair<int, int>>& cycle) {
     }
     return totalCost;
 }
+
+
 
 
 std::vector<std::pair<int, int>> Graph::findEulerCycle() {

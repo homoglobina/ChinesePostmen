@@ -8,6 +8,10 @@ generate:
 	g++ -Isrc/include -c generatorDanych/generateJson.cpp
 	g++ generateJson.o -o genJson 
 
+tester:
+	g++ -Isrc/include -c sprawdzanieWyniko/resultTester.cpp
+	g++ resultTester.o -o testJson 	
+
 
 delete:
 	rm *.o

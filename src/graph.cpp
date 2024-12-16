@@ -7,7 +7,6 @@
 #include <fstream>  // For file handling
 #include <iomanip> // For random colors
 #include <nlohmann/json.hpp> // Include the JSON library
-#include <fstream>
 #include <stack>
 
 using namespace std;

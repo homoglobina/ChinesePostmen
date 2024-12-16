@@ -46,6 +46,8 @@ int main() {
 
 
     }
+    int res = graphViz();
+    std::cout << "Graphviz: " << res ; 
     std::cin >> choice;
 
     return 0;

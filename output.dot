@@ -1,0 +1,10 @@
+graph G {
+  0 -- 3 [color="#df01d6"];
+  3 -- 4 [color="#df01d6"];
+  4 -- 2 [color="#df01d6"];
+  2 -- 3 [color="#df01d6"];
+  3 -- 1 [color="#0174df"];
+  1 -- 2 [color="#0174df"];
+  2 -- 3 [color="#0174df"];
+  3 -- 0 [color="#0174df"];
+}
