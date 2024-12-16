@@ -34,5 +34,8 @@ public:
 std::vector<int> dijkstra2(int start, int end, const std::vector<std::vector<int>>& adjMatrix, int vertices);
 
 
+std::vector<int> dijkstra3(int start, const std::vector<std::vector<int>>& adjMatrix, int vertices);
+std::vector<std::pair<int, int>> reconstructPath(int start, int end, const std::vector<int>& parent);
+
 
 #endif // GRAPH_H

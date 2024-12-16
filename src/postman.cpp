@@ -21,51 +21,70 @@ void Graph::solveChinesePostman(int n) {
     
 
 
-    cout << "\nEuler0" << ": ";
-    for (const auto& edge : eulerCycle) {
-        cout << "(" << edge.second << ", " << edge.first << ") ";
-    }
-    cout << endl;
+    // cout << "\nEuler0" << ": ";
+    // for (const auto& edge : eulerCycle) {
+    //     cout << "(" << edge.second << ", " << edge.first << ") ";
+    // }
+    // cout << endl;
 
     // test 
     vector<pair<int,int>> eulerCycle2;
-    cout << "Euler" << ": ";
+
+
+    // cout << "Euler" << ": ";
     for (const auto& edge : eulerCycle) {
-        if (localAdjMatrix[edge.second][edge.first] == 0){
-            // if in this loop then delete from eulerCycle the edge that is not in the original graph
-            eulerCycle.erase(std::remove(eulerCycle.begin(), eulerCycle.end(), edge), eulerCycle.end());
-            cout << "deleted";
+        if (localAdjMatrix[edge.second][edge.first] == 1){
+            // cout << "(" << edge.second << ", " << edge.first << ") ";
+            eulerCycle2.push_back({edge.second, edge.first});
+            // eulerCycle2.push_back(edge);
+            
         }
         else{
-            cout << "(" << edge.second << ", " << edge.first << ") ";
-            eulerCycle2.push_back(edge);
+            
+            auto parent = dijkstra3(edge.second, localAdjMatrix, vertices);
+            auto shortestPath = reconstructPath(edge.second, edge.first, parent);
+            
+            // cout << "shortest path: ";
+            for (const auto& edgePath : shortestPath) {
+                // cout << "(" << edgePath.first << ", " << edgePath.second << ") ";
+                // eulerCycle2.push_back(edge);
+                eulerCycle2.push_back({edgePath.first, edgePath.second});
+            }
+
+            // if in this loop then delete from eulerCycle the edge that is not in the original graph
+            // eulerCycle.erase(std::remove(eulerCycle.begin(), eulerCycle.end(), edge), eulerCycle.end());
+            // cout << "deleted";
 
         }
     }
 
 
-    cout << "\nEuler2" << ": ";
-    for (const auto& edge : eulerCycle) {
-        cout << "(" << edge.second << ", " << edge.first << ") ";
-    }
-    cout << endl;
+
+
+
+
+
+
+
 
     cout << "\nEulerEND" << ": ";
     for (const auto& edge : eulerCycle2) {
-        cout << "(" << edge.second << ", " << edge.first << ") ";
+        cout << "(" << edge.first << ", " << edge.second << ") ";
     }
     cout << endl;
 
+
+
     // Step 3: Split the Euler cycle into `n` connected subpaths
-    int totalEdges = eulerCycle.size();
+    int totalEdges = eulerCycle2.size();
     int edgesPerPostman = totalEdges / n;
     vector<vector<pair<int, int>>> postmenRoutes(n);
 
     // Split the Eulerian cycle into nearly equal subpaths
-    auto it = eulerCycle.begin();
+    auto it = eulerCycle2.begin();
     for (int i = 0; i < n; ++i) {
         int count = 0;
-        while (it != eulerCycle.end() && count < edgesPerPostman) {
+        while (it != eulerCycle2.end() && count < edgesPerPostman) {
             postmenRoutes[i].push_back(*it);
             ++it;
             ++count;
@@ -73,7 +92,7 @@ void Graph::solveChinesePostman(int n) {
     }
 
     // If there are remaining edges (in case totalEdges isn't divisible evenly), distribute them
-    while (it != eulerCycle.end()) {
+    while (it != eulerCycle2.end()) {
         postmenRoutes[n - 1].push_back(*it);
         ++it;
     }
@@ -83,7 +102,7 @@ void Graph::solveChinesePostman(int n) {
     for (int i = 0; i < n; ++i) {
         cout << "Postman " << i + 1 << ": ";
         for (const auto& edge : postmenRoutes[i]) {
-            cout << "(" << edge.second << ", " << edge.first << ") ";
+            cout << "(" << edge.first << ", " << edge.second << ") ";
         }
         cout << endl;
         totalCost += calculateCycleCost(postmenRoutes[i]);

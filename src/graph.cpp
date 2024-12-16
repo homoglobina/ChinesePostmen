@@ -171,13 +171,13 @@ void Graph::toGraphviz(const string& filename) const {
     std::random_device rd;
     std::mt19937 gen(rd());
     uniform_int_distribution<> colorDist(0, 255);
+    int r = colorDist(gen);
+    int g = colorDist(gen);
+    int b = colorDist(gen);
     
     outFile << "graph G {" << endl;
-    for (int i = 0; i < vertices; ++i) {
-        int r = colorDist(gen);
-        int g = colorDist(gen);
-        int b = colorDist(gen);
         
+    for (int i = 0; i < vertices; ++i) {
         // int color = colorDist(gen);
         for (int j = i + 1; j < vertices; ++j) {  
             if (adjMatrix[i][j] > 0) {

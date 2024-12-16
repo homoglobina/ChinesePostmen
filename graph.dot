@@ -1,16 +1,8 @@
 graph G {
-  0 -- 1 [color="#d51ac6"];
-  0 -- 2 [color="#d51ac6"];
-  0 -- 3 [color="#d51ac6"];
-  0 -- 4 [color="#d51ac6"];
-  0 -- 5 [color="#d51ac6"];
-  0 -- 6 [color="#d51ac6"];
-  1 -- 2 [color="#aece1c"];
-  1 -- 3 [color="#aece1c"];
-  1 -- 4 [color="#aece1c"];
-  1 -- 5 [color="#aece1c"];
-  2 -- 4 [color="#2f80bb"];
-  2 -- 6 [color="#2f80bb"];
-  3 -- 5 [color="#30543d"];
-  3 -- 6 [color="#30543d"];
+  0 -- 4 [color="#e09ba9"];
+  1 -- 2 [color="#e09ba9"];
+  1 -- 3 [color="#e09ba9"];
+  1 -- 4 [color="#e09ba9"];
+  1 -- 5 [color="#e09ba9"];
+  4 -- 5 [color="#e09ba9"];
 }
