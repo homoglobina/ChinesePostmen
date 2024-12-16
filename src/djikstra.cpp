@@ -8,9 +8,6 @@
 #include <utility>
 
 using namespace std;
-int INT_MAX = 2147483647;
-
-// Implement Dijkstra's algorithm to compute shortest path from source `start`
 vector<int> Graph::dijkstra(int start) {
     vector<int> dist(vertices, numeric_limits<int>::max());
     dist[start] = 0;
@@ -58,8 +55,6 @@ std::vector<int> dijkstra2(int start, int end, const std::vector<std::vector<int
             }
         }
     }
-
-    // Reconstruct the path
     std::vector<int> path;
     for (int at = end; at != -1; at = prev[at]) {
         path.push_back(at);
@@ -68,9 +63,6 @@ std::vector<int> dijkstra2(int start, int end, const std::vector<std::vector<int
     return path;
 }
 
-
-
-// Dijkstra's algorithm to compute shortest paths from `start`
 std::vector<int> dijkstra3(int start, const std::vector<std::vector<int>>& adjMatrix, int vertices) {
     std::vector<int> dist(vertices, std::numeric_limits<int>::max());
     std::vector<int> parent(vertices, -1);
@@ -94,10 +86,9 @@ std::vector<int> dijkstra3(int start, const std::vector<std::vector<int>>& adjMa
         }
     }
 
-    return parent; // Return the parent array to reconstruct the shortest path
+    return parent; 
 }
 
-// Function to reconstruct the shortest path from start to end using parent pointers
 std::vector<std::pair<int, int>> reconstructPath(int start, int end, const std::vector<int>& parent) {
     std::vector<std::pair<int, int>> path;
     int current = end;
@@ -107,6 +98,6 @@ std::vector<std::pair<int, int>> reconstructPath(int start, int end, const std::
         current = parent[current];
     }
 
-    std::reverse(path.begin(), path.end()); // Reverse to go from start -> end
+    std::reverse(path.begin(), path.end()); 
     return path;
 }

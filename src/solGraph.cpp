@@ -6,8 +6,6 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-
-// Function to generate unique colors for each postman
 std::string getColor(int index) {
     static const std::vector<std::string> colors = {
         "#df01d6", "#0174df", "#04b404", "#ff8000", "#ff0000"
@@ -16,11 +14,9 @@ std::string getColor(int index) {
 }
 
 int graphViz() {
-    // Input and output file names
     std::string inputFileName = "results.json";
     std::string outputFileName = "output.dot";
 
-    // Read JSON file
     std::ifstream inputFile(inputFileName);
     if (!inputFile.is_open()) {
         std::cerr << "Error opening input file!" << std::endl;
@@ -31,14 +27,11 @@ int graphViz() {
     inputFile >> inputData;
     inputFile.close();
 
-    // Open DOT file for writing
     std::ofstream outputFile(outputFileName);
     if (!outputFile.is_open()) {
         std::cerr << "Error opening output file!" << std::endl;
         return 1;
     }
-
-    // Start writing DOT file
     outputFile << "graph G {\n";
 
     const auto& postmen = inputData["postmen"];

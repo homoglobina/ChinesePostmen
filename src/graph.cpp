@@ -4,9 +4,9 @@
 #include <iostream>
 #include <algorithm> 
 #include <string>
-#include <fstream>  // For file handling
-#include <iomanip> // For random colors
-#include <nlohmann/json.hpp> // Include the JSON library
+#include <fstream>  
+#include <iomanip> 
+#include <nlohmann/json.hpp> 
 #include <stack>
 
 using namespace std;
@@ -17,7 +17,6 @@ using json = nlohmann::json;
 void Graph::addEdge(int u, int v) {
     adjMatrix[u][v] = 1;
     adjMatrix[v][u] = 1;
-    // cout << "added edge from " << u << " to " << v << endl;
 }
 
 
@@ -26,20 +25,13 @@ Graph::Graph(const std::string& jsonFile) {
     if (!file) {
         throw std::runtime_error("Error: Could not open JSON file " + jsonFile);
     }
-
     json j;
-    file >> j; // Parse JSON
-
-    // Check for vertices
+    file >> j;
     if (!j.contains("vertices") || !j.contains("edges")) {
         throw std::runtime_error("Invalid JSON format: missing 'vertices' or 'edges' fields.");
     }
-
-    // Initialize vertices
     vertices = j["vertices"];
     adjMatrix.resize(vertices, std::vector<int>(vertices, 0));
-
-    // Add edges from JSON
     for (const auto& edge : j["edges"]) {
         int u = edge[0];
         int v = edge[1];
@@ -54,16 +46,12 @@ Graph::Graph(int v, double saturation) : vertices(v), adjMatrix(v, vector<int>(v
     int totalEdges = v * (v - 1) / 2;
     int targetEdges = static_cast<int>(saturation * totalEdges);
     cout << "total: " << totalEdges << "  target: " << targetEdges << endl; 
-
-    // Generate all possible edges
     vector<pair<int, int>> allEdges;
     for (int i = 0; i < v; i++) {
         for (int j = i + 1; j < v; j++) { 
             allEdges.emplace_back(i, j);
         }
     }
-
-    // Shuffle edges
     random_device rd;
     mt19937 gen(rd());
     shuffle(allEdges.begin(), allEdges.end(), gen);
@@ -78,9 +66,9 @@ Graph::Graph(int v, double saturation) : vertices(v), adjMatrix(v, vector<int>(v
 vector<pair<int,int>> Graph::findEuler(){
     vector<pair<int,int>> eulerCycle;
     stack<int> stack;
-    vector<vector<int>> localAdjMatrix = adjMatrix; // Make a copy
+    vector<vector<int>> localAdjMatrix = adjMatrix; 
 
-    stack.push(0); // Start at any vertex
+    stack.push(0); 
     while (!stack.empty()) {
         int u = stack.top();
         int v = 0;
@@ -88,11 +76,9 @@ vector<pair<int,int>> Graph::findEuler(){
             v++;
         }
         if (v == vertices) {
-            // No more edges from u
             eulerCycle.emplace_back(u, -1);
             stack.pop();
         } else {
-            // Remove edge (u, v)
             stack.push(v);
             localAdjMatrix[u][v] = 0;
             localAdjMatrix[v][u] = 0;
@@ -159,7 +145,6 @@ void Graph::printAdjMatrix(){
 }
 
 void Graph::toGraphviz(const string& filename) const {
-    // Open file for writing
     ofstream outFile(filename);
     if (!outFile) {
         cerr << "Error: Could not open file " << filename << " for writing." << endl;
@@ -177,20 +162,14 @@ void Graph::toGraphviz(const string& filename) const {
     outFile << "graph G {" << endl;
         
     for (int i = 0; i < vertices; ++i) {
-        // int color = colorDist(gen);
         for (int j = i + 1; j < vertices; ++j) {  
             if (adjMatrix[i][j] > 0) {
-                
-
-                // Add edge with color
                 outFile << "  " << i << " -- " << j
                         << " [color=\"#" 
                         << std::hex << std::setw(2) << std::setfill('0') << r
                         << std::setw(2) << g
                         << std::setw(2) << b
                         << "\"];" << std::endl;
-
-                // Reset std::hex formatting for subsequent output
                 outFile << std::dec;
                         
             }

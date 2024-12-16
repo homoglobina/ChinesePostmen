@@ -1,7 +1,6 @@
 #include "graph.h"
 #include <iostream>
 
-int menu();
 int howManyPostmen();
 
 int main() {
@@ -11,20 +10,16 @@ int main() {
 
 
 
-    if (choice){    // use existing graph
+    if (choice){   
         Graph graph("graph.json");
-
-        // graph.printAdjMatrix();
-        graph.toGraphviz("graph.dot");  // Export to Graphviz format
-
-        // int x = menu();
+        graph.toGraphviz("graph.dot");  
         int numPostmen = howManyPostmen();
         graph.solveChinesePostman(numPostmen);
 
 
 
     }
-    else {  // Generate a graph
+    else {  
         int vertices = 3;
         double saturation = 0.5;
         std::cout << "Enter the number of vertices: ";
@@ -35,11 +30,7 @@ int main() {
 
         Graph graph(vertices, saturation);
 
-
-        // graph.printAdjMatrix();
-        graph.toGraphviz("graph.dot");  // Export to Graphviz format
-
-        // int x = menu();
+        graph.toGraphviz("graph.dot");  
         int numPostmen = howManyPostmen();
         graph.solveChinesePostman(numPostmen);
 
@@ -49,17 +40,9 @@ int main() {
     int res = graphViz();
     std::cout << "Graphviz: " << res ; 
     std::cin >> choice;
-
     return 0;
 }
 
-
-int menu(){
-    int choice;
-    std::cout << "What kind of algorithm do you wish to choose? \n1-greedy \n0-exact\nchoice:" ;
-    std::cin >> choice ;
-    return choice;
-}
 
 int howManyPostmen(){
     int numPostmen;

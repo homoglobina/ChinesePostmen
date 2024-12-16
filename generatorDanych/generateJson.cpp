@@ -1,5 +1,5 @@
 #include <iostream>
-#include <nlohmann/json.hpp> // Include the JSON library
+#include <nlohmann/json.hpp> 
 #include <fstream>
 #include <vector>
 #include <random>
@@ -45,7 +45,7 @@ int main() {
 
     ofstream outFile("graph.json");
     if (outFile.is_open()) {
-        outFile << graphJson.dump(); // Pretty print with 4 spaces indentation
+        outFile << graphJson.dump(); 
         outFile.close();
         cout << "Graph saved to graph.json" << endl;
     } else {

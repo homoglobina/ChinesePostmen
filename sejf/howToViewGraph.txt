@@ -1,2 +1,0 @@
-dot -Tx11 graph.dot // interaktywnie
-dot -Tpng graph.dot -o graph.png  // png
