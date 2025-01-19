@@ -180,6 +180,14 @@ void Graph::toGraphviz(const string& filename) const {
     cout << "Graph exported to " << filename << " in Graphviz DOT format." << endl;
 }
 
+void Graph::setSeed(int seed) {
+    this->seed = seed;
+}
+
+int Graph::getSeed() const {
+    return seed;
+}
+
 int Graph::getEdges() const {
     int edgeCount = 0;
     for (int i = 0; i < vertices; ++i) {

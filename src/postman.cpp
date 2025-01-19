@@ -120,8 +120,6 @@ vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>
     return path;
 }
 
-
-
 void Graph::makeGraphEulerian() {
     auto oddVertices = getOddDegreeVertices();
     if (oddVertices.size() % 2 != 0) {

@@ -5,16 +5,18 @@
 int howManyPostmen();
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <json file>  <number of postmen> " << std::endl;
+    if (argc != 4) {
+        std::cerr << "Usage: " << argv[0] << " <json file>  <number of postmen>  <seed>" << std::endl;
         return 1;
     }
 
     std::string jsonFile = argv[1];
-    int numPostmen = std::stoi(argv[2]);
-
     Graph graph(jsonFile);
 
+    int seed = std::stoi(argv[3]);
+    graph.setSeed(seed);
+
+    int numPostmen = std::stoi(argv[2]);
     if (numPostmen > graph.getEdges()) {
         std::cerr << "Number of postmen cannot be greater than the number of edges." << std::endl;
         return 1;

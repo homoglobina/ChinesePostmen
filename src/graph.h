@@ -9,7 +9,7 @@ class Graph {
 private:
     int vertices;
     std::vector<std::vector<int>> adjMatrix;
-
+    int seed;
 
 public:
     Graph(int v, double satruation);
@@ -23,6 +23,9 @@ public:
     bool isEulerian() const;
     void printAdjMatrix();
     void toGraphviz(const std::string& filename) const;
+    
+    void setSeed(int seed);
+    int getSeed() const;
 
     void solveChinesePostman(int n);
     void makeGraphEulerian();
@@ -31,6 +34,8 @@ public:
     std::vector<std::pair<int,int>> findEuler();
     std::vector<int> dijkstra(int start);
     std::vector<int> reconstructShortestPath(int start, int end, const std::vector<int>& dist);
+
+    vector<int> shuffeledVertices(int vertices);
 
     void solveGenetic(int n, int x);
     std::pair<int, int> findBestPopulations(std::vector<float> &fitnessScores, std::vector<std::vector<std::vector<int>>> &populations, int n);

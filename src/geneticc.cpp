@@ -10,7 +10,7 @@ using namespace std;
 
 using json = nlohmann::json;
 
-vector<int> shuffeledVertices(vector<vector<int>> adjMatrix, int vertices){
+vector<int> Graph::shuffeledVertices(int vertices){
     vector<int> verticesWithEdges;
     for (int i = 0; i < vertices; ++i) {
     for (int j = 0; j < vertices; ++j) {
@@ -20,8 +20,7 @@ vector<int> shuffeledVertices(vector<vector<int>> adjMatrix, int vertices){
             }
         }
     }
-    random_device rd;
-    mt19937 gen(rd());
+    mt19937 gen(getSeed());
     shuffle(verticesWithEdges.begin(), verticesWithEdges.end(), gen);
     return verticesWithEdges;
 }
@@ -94,9 +93,9 @@ float Graph::testFitness(vector<vector<int>> route) {
 }
 
 
-vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2) {
-    random_device rd;
-    mt19937 gen(rd());
+vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2, int seed) {
+
+    mt19937 gen(seed);
     uniform_int_distribution<> dist(0, population1[0].size() - 1);  // Possible out-of-bounds
 
     vector<vector<int>> newPopulation(population1.size());
@@ -256,7 +255,7 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
             vector<vector<int>> population1 = population;
             vector<vector<int>> population2 = createPopulation(verticesWithEdges, n, getEdges());
 
-            vector<vector<int>> crossoverPopulation = crossover(population1, population2);
+            vector<vector<int>> crossoverPopulation = crossover(population1, population2,getSeed());
             mutate(crossoverPopulation, verticesWithEdges, getEdges());
 
             float crossoverFitness = testFitness(crossoverPopulation);
