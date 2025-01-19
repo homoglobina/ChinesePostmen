@@ -73,6 +73,12 @@ void Graph::solveChinesePostman(int n) {
     cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
 
 
+
+
+
+
+
+
     json result;
 
     for (int i = 0; i < n; ++i) {

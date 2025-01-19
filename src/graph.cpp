@@ -89,8 +89,6 @@ vector<pair<int,int>> Graph::findEuler(){
 
 }
 
-
-
 int Graph::getVertices() const {
     return vertices;
 }
@@ -191,5 +189,5 @@ int Graph::getEdges() const {
             }
         }
     }
-    return edgeCount;
+    return edgeCount - 1;
 }

@@ -200,6 +200,23 @@ void mutate(vector<vector<int>>& population, const vector<int>& verticesWithEdge
 //     }
 // }
 
+int countValidEdges(const vector<vector<int>>& population, const vector<vector<int>>& adjMatrix) {
+    int validEdges = 0;
+    vector<vector<bool>> visitedEdges(adjMatrix.size(), vector<bool>(adjMatrix.size(), false));
+    for (const auto& route : population) {
+        for (size_t i = 0; i < route.size() - 1; ++i) {
+            int from = route[i];
+            int to = route[i + 1];
+            if (adjMatrix[from][to] > 0 && !visitedEdges[from][to] && !visitedEdges[to][from]) {
+                validEdges++;
+                visitedEdges[from][to] = true;
+                visitedEdges[to][from] = true; // Mark the reverse direction as visited
+            }
+        }
+    }
+    return validEdges;
+}
+
 void Graph::solveGenetic(int n, int x) { // number of postmen, number of generations
     vector<int> verticesWithEdges = shuffeledVertices(adjMatrix, getVertices());
     if (n > verticesWithEdges.size()) {
@@ -265,11 +282,12 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
     float accuracy = 1;
     accuracy = (float)getEdges() / (float)totalEdgesLastGen; 
     cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
-    // cout << "Total edges in last generation: " << totalEdgesLastGen << endl;
+    cout << "Total edges in last generation: " << totalEdgesLastGen << endl;
+    // cout << "get Edges: " << getEdges() << endl;
 
-
-
-
+    int validEdges = countValidEdges(population, adjMatrix);
+    cout << "Number of valid edges in the solution: " << validEdges << endl;
+    cout << "Correctness: " << ( (float)validEdges / (float)getEdges() ) * 100 << "%" << endl;
 
 
 
