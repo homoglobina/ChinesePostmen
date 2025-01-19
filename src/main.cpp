@@ -14,9 +14,27 @@ int main(int argc, char* argv[]) {
     int numPostmen = std::stoi(argv[2]);
 
     Graph graph(jsonFile);
+
+    if (numPostmen > graph.getEdges()) {
+        std::cerr << "Number of postmen cannot be greater than the number of edges." << std::endl;
+        return 1;
+    }
     graph.toGraphviz("graph.dot");  
+
+
     graph.solveChinesePostman(numPostmen);
+
+
+    // graph.solveAnts(3);
+
+
+    graph.solveGenetic(numPostmen);
+
+
 }
+    
+
+
 
 
 

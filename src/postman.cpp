@@ -68,6 +68,11 @@ void Graph::solveChinesePostman(int n) {
         totalCost += calculateCycleCost(postmenRoutes[i]);
     }
     cout << "Total cost: " << totalCost << endl;
+    float accuracy = 1;
+    accuracy = (float)getEdges() / (float)totalCost; 
+    cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
+
+
     json result;
 
     for (int i = 0; i < n; ++i) {
@@ -91,10 +96,6 @@ void Graph::solveChinesePostman(int n) {
         cerr << "Unable to open file for writing." << endl;
     }
 }
-
-
-
-
 
 vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>& dist) {
     vector<int> path;

@@ -181,3 +181,15 @@ void Graph::toGraphviz(const string& filename) const {
     outFile.close();
     cout << "Graph exported to " << filename << " in Graphviz DOT format." << endl;
 }
+
+int Graph::getEdges() const {
+    int edgeCount = 0;
+    for (int i = 0; i < vertices; ++i) {
+        for (int j = i + 1; j < vertices; ++j) {
+            if (adjMatrix[i][j] > 0) {
+                edgeCount++;
+            }
+        }
+    }
+    return edgeCount;
+}
