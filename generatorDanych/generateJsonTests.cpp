@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) { //  ./genJsonTests 123 5 0.7 (seed,number_of_
     v = stoi(argv[2]);
     saturation = stod(argv[3]);
 
+    string filNr = to_string(v);
 
 
 
@@ -64,7 +65,7 @@ int main(int argc, char* argv[]) { //  ./genJsonTests 123 5 0.7 (seed,number_of_
         graphJson["edges"].push_back({edge.first, edge.second});
     }
 
-    ofstream outFile("graphTest.json");
+    ofstream outFile("graphTest" + filNr + ".json");
     if (outFile.is_open()) {
         outFile << graphJson.dump(); 
         outFile.close();

@@ -1,6 +1,8 @@
 #include "graph.h"
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <fstream>
 
 int howManyPostmen();
 
@@ -51,17 +53,32 @@ int main(int argc, char* argv[]) {
     }
     graph.toGraphviz("graph.dot");  
 
+    int gen = 500;
 
+
+    
+
+    auto start = std::chrono::high_resolution_clock::now();
     graph.solveChinesePostman(numPostmen);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> chinesePostmanTime = end - start;
 
-
-    // graph.solveAnts(3);
-
-    int gen = 100;
-    std::cout << "Enter the number of generations: "; std::cin >> gen;
-
+    start = std::chrono::high_resolution_clock::now();
     graph.solveGenetic(numPostmen, gen);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> geneticTime = end - start;
 
+    std::ofstream csvFile("wykres.csv", std::ios::app);
+
+
+
+    if (csvFile.is_open()) {
+        // csvFile << graph.getEdges() << "," << chinesePostmanTime.count() << "," << geneticTime.count() << "," << graph.getVertices() << "\n";
+        csvFile << graph.getEdges() << "," << chinesePostmanTime.count() << "," << 0 << "," << graph.getVertices() << "\n";
+        csvFile.close();
+    } else {
+        std::cerr << "Unable to open file wykres.csv" << std::endl;
+    }
 
 }
     

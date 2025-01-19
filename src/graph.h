@@ -35,7 +35,7 @@ public:
     std::vector<int> dijkstra(int start);
     std::vector<int> reconstructShortestPath(int start, int end, const std::vector<int>& dist);
 
-    vector<int> shuffeledVertices(int vertices);
+    std::vector<int> shuffeledVertices(int vertices);
 
     void solveGenetic(int n, int x);
     std::pair<int, int> findBestPopulations(std::vector<float> &fitnessScores, std::vector<std::vector<std::vector<int>>> &populations, int n);
