@@ -40,11 +40,8 @@ vector<vector<int>> createPopulation(vector<int> verticesWithEdges, int n, int t
 
 }
 
-
-
-
 float Graph::testFitness(vector<vector<int>> route){
-    adjMatrix = getAdjMatrix();
+    vector<vector<int>> adjMatrix = getAdjMatrix();
     // for (int i = 0; i < adjMatrix.size(); ++i) {
     //     for (int j = 0; j < adjMatrix[i].size(); ++j) {
     //         cout << adjMatrix[i][j] << " ";
@@ -66,21 +63,6 @@ float Graph::testFitness(vector<vector<int>> route){
     return fitness - edges*2;
 }
 
-// void mutate(vector<vector<int>> &population, vector<int> verticesWithEdges, int totalEdges){
-//     random_device rd;
-//     mt19937 gen(rd());
-//     uniform_int_distribution<> dist(0, population.size() - 1);
-//     uniform_int_distribution<> dist2(0, totalEdges - 1);
-//     uniform_int_distribution<> dist3(0, verticesWithEdges.size() - 1);
-
-//     int postman = dist(gen);
-//     int route = dist2(gen);
-//     int vertex = dist3(gen);
-
-//     population[postman][route] = verticesWithEdges[vertex];
-// }
-
-
 vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2) {
     random_device rd;
     mt19937 gen(rd());
@@ -101,8 +83,6 @@ vector<vector<int>> crossover(const vector<vector<int>>& population1, const vect
     return newPopulation;
 }
 
-
-
 void mutate(vector<vector<int>>& population, const vector<int>& verticesWithEdges, int totalEdges) {
     random_device rd;
     mt19937 gen(rd());
@@ -110,38 +90,95 @@ void mutate(vector<vector<int>>& population, const vector<int>& verticesWithEdge
     uniform_int_distribution<> dist2(0, totalEdges - 1);
     uniform_int_distribution<> dist3(0, verticesWithEdges.size() - 1);
 
-    int postman = dist(gen);
-    int route = dist2(gen);
-    int vertex = dist3(gen);
+    for (int i = 0; i < 5; ++i) { // Increase mutation rate by performing 5 mutations
+        int postman = dist(gen);
+        int route = dist2(gen);
+        int vertex = dist3(gen);
 
-    population[postman][route] = verticesWithEdges[vertex];
+        if (route < population[postman].size()) {
+            population[postman][route] = verticesWithEdges[vertex];
+        }
     }
+}
 
 
-void Graph::solveGenetic(int n){ // number of postmen
-    
+// void Graph::solveGenetic(int n, int x) { // number of postmen, number of generations
+//     vector<int> verticesWithEdges = shuffeledVertices(adjMatrix, getVertices());
+//     if (n > verticesWithEdges.size()) {
+//         cerr << "Number of postmen cannot be greater than the number of vertices." << endl;
+//         return;
+//     }
+
+//     vector<int> postmenStart;
+//     for (int i = 0; i < n; i++) {
+//         postmenStart.push_back(verticesWithEdges[i]);
+//     }
+
+//     // basis for genetic algorithm
+//     vector<vector<vector<int>>> populations;
+//     vector<vector<int>> population;
+//     vector<float> fitnessScores;
+
+//     for (int gen = 0; gen < x; ++gen) {
+//         populations.clear();
+//         fitnessScores.clear();
+
+//         for (int i = 0; i < 10; ++i) {
+//             population = createPopulation(verticesWithEdges, n, getEdges());
+//             float fitness = testFitness(population);
+//             populations.push_back(population);
+//             fitnessScores.push_back(fitness);
+//         }
+
+//         pair<int, int> bestPopulations = findBestPopulations(fitnessScores, populations, n);
+//         vector<vector<int>> population1 = populations[bestPopulations.first];
+//         vector<vector<int>> population2 = populations[bestPopulations.second];
+
+//         vector<vector<int>> newPopulation = crossover(population1, population2);
+//         mutate(newPopulation, verticesWithEdges, getEdges());
+
+//         float newFitness = testFitness(newPopulation);
+//         cout << "Generation " << gen + 1 << " new population fitness: " << newFitness << endl;
+
+//         for (int i = 0; i < n; ++i) {
+//             cout << "Postman " << i + 1 << " new route: ";
+//             for (int vertex : newPopulation[i]) {
+//                 cout << vertex << " ";
+//             }
+//             cout << endl;
+//         }
+
+//         populations.push_back(newPopulation);
+//         fitnessScores.push_back(newFitness);
+//     }
+// }
+
+void Graph::solveGenetic(int n, int x) { // number of postmen, number of generations
     vector<int> verticesWithEdges = shuffeledVertices(adjMatrix, getVertices());
-    if (n > verticesWithEdges.size()){
+    if (n > verticesWithEdges.size()) {
         cerr << "Number of postmen cannot be greater than the number of vertices." << endl;
         return;
     }
 
     vector<int> postmenStart;
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         postmenStart.push_back(verticesWithEdges[i]);
     }
 
-
     // basis for genetic algorithm
-    vector<vector<vector<int>>> populations;
-    vector<vector<int>> population;
-    vector<float> fitnessScores;
+    vector<vector<int>> population = createPopulation(verticesWithEdges, n, getEdges());
+    float fitness = testFitness(population);
 
-    for (int i = 0; i < 10; ++i) {
-        population = createPopulation(verticesWithEdges, n, getEdges());
-        float fitness = testFitness(population);
-        cout << "Generation " << i + 1 << "  fitness: " << fitness << endl;
-        
+    for (int gen = 0; gen < x; ++gen) {
+        vector<vector<int>> newPopulation = createPopulation(verticesWithEdges, n, getEdges());
+        float newFitness = testFitness(newPopulation);
+
+        if (newFitness > fitness) {
+            population = newPopulation;
+            fitness = newFitness;
+        }
+
+        cout << "Generation " << gen + 1 << " fitness: " << fitness << endl;
         for (int i = 0; i < n; ++i) {
             cout << "Postman " << i + 1 << " route: ";
             for (int vertex : population[i]) {
@@ -149,56 +186,21 @@ void Graph::solveGenetic(int n){ // number of postmen
             }
             cout << endl;
         }
-        populations.push_back(population);
-        fitnessScores.push_back(fitness);
-        
-    }
 
-    cout << endl << endl << endl;
+        if (gen < x - 1) {
+            vector<vector<int>> population1 = population;
+            vector<vector<int>> population2 = createPopulation(verticesWithEdges, n, getEdges());
 
-    pair<int,int> bestPopulations = findBestPopulations(fitnessScores, populations, n);
-    vector<vector<int>> population1, population2;
-    population1 = populations[bestPopulations.first];
-    population2 = populations[bestPopulations.second];
+            vector<vector<int>> crossoverPopulation = crossover(population1, population2);
+            mutate(crossoverPopulation, verticesWithEdges, getEdges());
 
-
-    
-
-    vector<vector<int>> newPopulation = crossover(population1, population2);
-    mutate(newPopulation, verticesWithEdges, getEdges());
-
-    float newFitness = testFitness(newPopulation);
-    cout << "New population fitness: " << newFitness << endl;
-
-    for (int i = 0; i < n; ++i) {
-        cout << "Postman " << i + 1 << " new route: ";
-        for (int vertex : newPopulation[i]) {
-            cout << vertex << " ";
+            float crossoverFitness = testFitness(crossoverPopulation);
+            if (crossoverFitness > fitness) {
+                population = crossoverPopulation;
+                fitness = crossoverFitness;
+            }
         }
-        cout << endl;
     }
-
-
-    // Find the two populations with the best fitness
-
-
-
-
-    // // Use the best populations for further processing
-    // vector<vector<int>> population2 = bestPopulation2;
-    // population = bestPopulation1; // or bestPopulation2 depending on your needs
-
-
-
-    // for (int i = 0; i < n; ++i) {
-    //     cout << "Postman " << i + 1 << " route: ";
-    //     for (int vertex : population2[i]) {
-    //         cout << vertex << " ";
-    //     }
-    //     cout << endl;
-    // }
-
-    // mutate(population, verticesWithEdges, getEdges());
 }
 
 pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std::vector<std::vector<std::vector<int>>> &populations, int n)

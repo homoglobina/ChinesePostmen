@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     // graph.solveAnts(3);
 
 
-    graph.solveGenetic(numPostmen);
+    graph.solveGenetic(numPostmen, 10);
 
 
 }

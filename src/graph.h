@@ -32,12 +32,9 @@ public:
     std::vector<int> dijkstra(int start);
     std::vector<int> reconstructShortestPath(int start, int end, const std::vector<int>& dist);
 
-    void solveGenetic(int n);
+    void solveGenetic(int n, int x);
     std::pair<int, int> findBestPopulations(std::vector<float> &fitnessScores, std::vector<std::vector<std::vector<int>>> &populations, int n);
     float testFitness(std::vector<std::vector<int>> route);
-    
-
-    void solveAnts(int n);
 
 
 };
