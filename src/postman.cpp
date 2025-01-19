@@ -13,6 +13,33 @@
 using json = nlohmann::json;
 using namespace std;
 
+/**
+ * @brief Solves the Chinese Postman Problem for the given graph.
+ * 
+ * This function makes the graph Eulerian, finds an Euler cycle, and then 
+ * distributes the edges of the cycle among the given number of postmen. 
+ * It calculates the total cost of the routes and saves the results in a JSON file.
+ * 
+ * @param n The number of postmen.
+ * 
+ * The function performs the following steps:
+ * 1. Copies the adjacency matrix to a local variable.
+ * 2. Makes the graph Eulerian by adding necessary edges.
+ * 3. Finds an Euler cycle in the graph.
+ * 4. Reconstructs the Euler cycle to ensure all edges are covered.
+ * 5. Distributes the edges of the Euler cycle among the postmen.
+ * 6. Calculates the total cost of the routes.
+ * 7. Prints the routes and total cost.
+ * 8. Calculates and prints the accuracy of the solution.
+ * 9. Saves the results in a JSON file named "results.json".
+ * 
+ * The JSON file contains:
+ * - The routes for each postman.
+ * - The cost of each postman's route.
+ * - The total cost of all routes.
+ * 
+ * @note The function assumes that the graph is connected and all vertices have even degree.
+ */
 void Graph::solveChinesePostman(int n) {
     vector<vector<int>> localAdjMatrix = adjMatrix;
     makeGraphEulerian();
@@ -72,13 +99,6 @@ void Graph::solveChinesePostman(int n) {
     accuracy = (float)getEdges() / (float)totalCost; 
     cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
 
-
-
-
-
-
-
-
     json result;
 
     for (int i = 0; i < n; ++i) {
@@ -103,6 +123,18 @@ void Graph::solveChinesePostman(int n) {
     }
 }
 
+/**
+ * @brief Reconstructs the shortest path from start to end using the distance vector.
+ * 
+ * This function takes the start and end vertices along with the distance vector
+ * and reconstructs the shortest path from start to end by backtracking through
+ * the adjacency matrix.
+ * 
+ * @param start The starting vertex of the path.
+ * @param end The ending vertex of the path.
+ * @param dist The distance vector containing the shortest distances from the start vertex.
+ * @return A vector containing the vertices in the shortest path from start to end.
+ */
 vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>& dist) {
     vector<int> path;
     int current = end;
@@ -120,6 +152,14 @@ vector<int> Graph::reconstructShortestPath(int start, int end, const vector<int>
     return path;
 }
 
+/**
+ * @brief Converts the graph to an Eulerian graph by adding the minimum number of edges.
+ * 
+ * This function modifies the graph to make it Eulerian by ensuring all vertices have even degrees.
+ * It identifies vertices with odd degrees and pairs them up by adding edges with the minimum cost.
+ * 
+ * @throws std::runtime_error if the number of vertices with odd degrees is odd.
+ */
 void Graph::makeGraphEulerian() {
     auto oddVertices = getOddDegreeVertices();
     if (oddVertices.size() % 2 != 0) {
@@ -157,6 +197,15 @@ int Graph::calculateCycleCost(const std::vector<std::pair<int, int>>& cycle) {
     return totalCost;
 }
 
+/**
+ * @brief Finds an Eulerian cycle in the graph.
+ * 
+ * This function uses Hierholzer's algorithm to find an Eulerian cycle in the graph.
+ * An Eulerian cycle is a cycle that visits every edge exactly once.
+ * 
+ * @return std::vector<std::pair<int, int>> A vector of pairs representing the edges in the Eulerian cycle.
+ * Each pair contains two integers representing the vertices connected by the edge.
+ */
 std::vector<std::pair<int, int>> Graph::findEulerCycle() {
     std::vector<std::pair<int, int>> eulerCycle;
     std::stack<int> stack;

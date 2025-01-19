@@ -4,6 +4,30 @@
 
 int howManyPostmen();
 
+/**
+ * @file main.cpp
+ * @brief Entry point for the Chinese Postman problem solver.
+ *
+ * This program reads a graph from a JSON file, initializes the graph, and solves the Chinese Postman problem
+ * using different algorithms.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line arguments.
+ *             - argv[0]: Program name
+ *             - argv[1]: Path to the JSON file containing the graph
+ *             - argv[2]: Number of postmen
+ *             - argv[3]: Seed for random number generation
+ *
+ * @return int Exit status of the program.
+ *             - 0: Success
+ *             - 1: Error
+ *
+ * Usage:
+ * @code
+ * ./program <json file> <number of postmen> <seed>
+ * @endcode
+ */
+
 int main(int argc, char* argv[]) {
     if (argc != 4) {
         std::cerr << "Usage: " << argv[0] << " <json file>  <number of postmen>  <seed>" << std::endl;
