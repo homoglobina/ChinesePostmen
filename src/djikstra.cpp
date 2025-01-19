@@ -9,6 +9,7 @@
 
 using namespace std;
 /**
+ * @file djikstra.cpp
  * @brief Computes the shortest paths from a starting vertex to all other vertices in the graph using Dijkstra's algorithm.
  * 
  * This function uses a priority queue to efficiently find the shortest path from the starting vertex to all other vertices.

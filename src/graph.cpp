@@ -22,7 +22,7 @@ void Graph::addEdge(int u, int v) {
 
 /**
  * @brief Constructs a Graph object from a JSON file.
- * 
+ * @file graph.cpp
  * This constructor reads a JSON file containing the graph's vertices and edges,
  * initializes the adjacency matrix, and adds the edges to the graph.
  * 

@@ -7,7 +7,11 @@ int howManyPostmen();
 /**
  * @file main.cpp
  * @brief Entry point for the Chinese Postman problem solver.
- *
+ *@version 1.0
+ *author Jakub Doman
+ * Compilation
+ * Make compile
+ * 
  * This program reads a graph from a JSON file, initializes the graph, and solves the Chinese Postman problem
  * using different algorithms.
  *
@@ -24,7 +28,7 @@ int howManyPostmen();
  *
  * Usage:
  * @code
- * ./program <json file> <number of postmen> <seed>
+ * ./main <json file> <number of postmen> <seed>
  * @endcode
  */
 

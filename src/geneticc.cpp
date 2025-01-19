@@ -11,6 +11,7 @@ using namespace std;
 using json = nlohmann::json;
 
 /**
+ * @file genetic.cpp
  * @brief Generates a shuffled list of vertices that have edges.
  *
  * This function iterates through the adjacency matrix to find vertices that have at least one edge.

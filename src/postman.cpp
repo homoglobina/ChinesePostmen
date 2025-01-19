@@ -14,6 +14,7 @@ using json = nlohmann::json;
 using namespace std;
 
 /**
+ * @file graph.cpp
  * @brief Solves the Chinese Postman Problem for the given graph.
  * 
  * This function makes the graph Eulerian, finds an Euler cycle, and then 
