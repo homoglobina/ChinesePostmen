@@ -3,10 +3,24 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 using namespace std;
 
-vector<int> shuffeledVertices(vector<vector<int>> adjMatrix, int vertices){
+using json = nlohmann::json;
+
+/**
+ * @file genetic.cpp
+ * @brief Generates a shuffled list of vertices that have edges.
+ *
+ * This function iterates through the adjacency matrix to find vertices that have at least one edge.
+ * It then shuffles these vertices using a random number generator.
+ *
+ * @param vertices The total number of vertices in the graph.
+ * @return A vector containing the shuffled vertices that have edges.
+ */
+vector<int> Graph::shuffeledVertices(int vertices){
     vector<int> verticesWithEdges;
     for (int i = 0; i < vertices; ++i) {
     for (int j = 0; j < vertices; ++j) {
@@ -16,13 +30,16 @@ vector<int> shuffeledVertices(vector<vector<int>> adjMatrix, int vertices){
             }
         }
     }
-    random_device rd;
-    mt19937 gen(rd());
+    mt19937 gen(getSeed());
     shuffle(verticesWithEdges.begin(), verticesWithEdges.end(), gen);
     return verticesWithEdges;
 }
 
-
+/// @brief 
+/// @param verticesWithEdges 
+/// @param n 
+/// @param totalEdges 
+/// @return 
 vector<vector<int>> createPopulation(vector<int> verticesWithEdges, int n, int totalEdges){
     random_device rd;
     mt19937 gen(rd());
@@ -33,45 +50,98 @@ vector<vector<int>> createPopulation(vector<int> verticesWithEdges, int n, int t
     for (int i = 0; i < n; ++i) {
         int routeLength = dist(gen);
         for (int j = 0; j < routeLength; ++j) {
+            if (verticesWithEdges.empty()) break;  // Prevents accessing empty vectors
             postmenRoutes[i].push_back(verticesWithEdges[(i + j) % verticesWithEdges.size()]);
         }
     }
     return postmenRoutes;
-
 }
 
-float Graph::testFitness(vector<vector<int>> route){
+
+/**
+ * @brief Calculates the fitness of a given set of routes in the graph.
+ *
+ * This function evaluates the fitness of a set of routes based on the adjacency matrix of the graph.
+ * The fitness is calculated by summing the weights of the edges used in the routes, penalizing for
+ * missing edges, route imbalance, and excessive total route length.
+ *
+ * @param route A vector of vectors representing the routes. Each inner vector contains the sequence
+ *              of nodes in a route.
+ * @return The fitness value of the given routes. Higher values indicate better fitness.
+ */
+float Graph::testFitness(vector<vector<int>> route) {
     vector<vector<int>> adjMatrix = getAdjMatrix();
-    // for (int i = 0; i < adjMatrix.size(); ++i) {
-    //     for (int j = 0; j < adjMatrix[i].size(); ++j) {
-    //         cout << adjMatrix[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    
+    int totalEdges = getEdges();
+
     float fitness = 0;
-    int edges = 0;
+    int usedEdges = 0;
+    vector<vector<bool>> visitedEdges(adjMatrix.size(), vector<bool>(adjMatrix.size(), false));
+    
+    // Track route lengths to penalize imbalance
+    vector<int> routeLengths(route.size(), 0);
+
     for (int i = 0; i < route.size(); ++i) {
         for (int j = 0; j < route[i].size() - 1; ++j) {
-            edges++;
-            fitness += adjMatrix[route[i][j]][route[i][j + 1]];
-            // cout << "i: " << i << " j: " << j << " route[i][j] " << route[i][j] << " route[i][j+1]: " << route[i][j+1] << " fitness: " << fitness<< endl;            
+            int from = route[i][j];
+            int to = route[i][j + 1];
+
+            if (adjMatrix[from][to] > 0) {
+                if (!visitedEdges[from][to]) {
+                    visitedEdges[from][to] = true;
+                    usedEdges++;
+                }
+                fitness += adjMatrix[from][to];
+            }
+
+            routeLengths[i]++;
         }
     }
 
-    edges = edges - getEdges(); // conditon to not make solution obsuletely enourmous
-    return fitness - edges*2;
+    // Penalize missing edges
+    int missingEdges = totalEdges - usedEdges;
+    fitness -= missingEdges * 5;  // Higher penalty for missing edges
+
+    // Penalize route imbalance
+    int maxLength = *max_element(routeLengths.begin(), routeLengths.end());
+    int minLength = *min_element(routeLengths.begin(), routeLengths.end());
+    int imbalance = maxLength - minLength;
+    fitness -= imbalance * 1;  // Adjust penalty weight as needed
+
+    // Penalize excessive total route length
+    int totalRouteLength = accumulate(routeLengths.begin(), routeLengths.end(), 0);
+    int excessLength = totalRouteLength - totalEdges;
+    if (excessLength > 0) {
+        fitness -= excessLength * 2;
+    }
+
+    return fitness;
 }
 
-vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2) {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dist(0, population1.size() - 1);
+
+/**
+ * @brief Performs a crossover operation on two populations to generate a new population.
+ *
+ * This function takes two populations of vectors and performs a crossover operation
+ * to generate a new population. The crossover point is determined randomly using
+ * the provided seed. The new population is created by combining elements from both
+ * parent populations up to the crossover point.
+ *
+ * @param population1 The first parent population.
+ * @param population2 The second parent population.
+ * @param seed The seed for the random number generator.
+ * @return A new population generated by combining elements from the two parent populations.
+ */
+vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2, int seed) {
+
+    mt19937 gen(seed);
+    uniform_int_distribution<> dist(0, population1[0].size() - 1);  // Possible out-of-bounds
 
     vector<vector<int>> newPopulation(population1.size());
 
     for (int i = 0; i < population1.size(); ++i) {
-        int crossoverPoint = dist(gen);
+        if (population1[i].empty() || population2[i].empty()) continue; // Prevents accessing empty vectors
+        int crossoverPoint = dist(gen) % min(population1[i].size(), population2[i].size());
+
         for (int j = 0; j < crossoverPoint; ++j) {
             newPopulation[i].push_back(population1[i][j]);
         }
@@ -79,82 +149,109 @@ vector<vector<int>> crossover(const vector<vector<int>>& population1, const vect
             newPopulation[i].push_back(population2[i][j]);
         }
     }
-
     return newPopulation;
 }
 
+
+/**
+ * @brief Mutates a given population of routes by randomly altering some routes and occasionally swapping sections of routes.
+ * 
+ * This function performs two types of mutations on the population:
+ * 1. Randomly changes vertices in multiple routes.
+ * 2. Occasionally swaps the first elements of routes between two different postmen.
+ * 
+ * @param population A reference to a vector of vectors representing the population of routes.
+ * @param verticesWithEdges A reference to a vector of integers representing vertices that have edges.
+ * @param totalEdges An integer representing the total number of edges.
+ * 
+ * @note The function does nothing if the population or verticesWithEdges are empty.
+ */
 void mutate(vector<vector<int>>& population, const vector<int>& verticesWithEdges, int totalEdges) {
+    if (population.empty() || verticesWithEdges.empty()) return;
+
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dist(0, population.size() - 1);
-    uniform_int_distribution<> dist2(0, totalEdges - 1);
-    uniform_int_distribution<> dist3(0, verticesWithEdges.size() - 1);
+    uniform_int_distribution<> postmanDist(0, population.size() - 1);
+    uniform_int_distribution<> routeDist(0, totalEdges - 1);
+    uniform_int_distribution<> vertexDist(0, verticesWithEdges.size() - 1);
 
-    for (int i = 0; i < 5; ++i) { // Increase mutation rate by performing 5 mutations
-        int postman = dist(gen);
-        int route = dist2(gen);
-        int vertex = dist3(gen);
+    // Mutate multiple routes randomly
+    for (int i = 0; i < 2; ++i) {  
+        int postman = postmanDist(gen);
+        if (population[postman].empty()) continue;
 
-        if (route < population[postman].size()) {
-            population[postman][route] = verticesWithEdges[vertex];
+        int route = routeDist(gen) % population[postman].size();
+        int vertex = vertexDist(gen);
+
+        population[postman][route] = verticesWithEdges[vertex];
+    }
+
+    // Occasionally swap a section of routes
+    if (population.size() > 1 && verticesWithEdges.size() > 2) {
+        int p1 = postmanDist(gen);
+        int p2 = postmanDist(gen);
+        if (p1 != p2 && !population[p1].empty() && !population[p2].empty()) {
+            swap(population[p1][0], population[p2][0]); // Swap first elements
         }
     }
 }
 
 
-// void Graph::solveGenetic(int n, int x) { // number of postmen, number of generations
-//     vector<int> verticesWithEdges = shuffeledVertices(adjMatrix, getVertices());
-//     if (n > verticesWithEdges.size()) {
-//         cerr << "Number of postmen cannot be greater than the number of vertices." << endl;
-//         return;
-//     }
 
-//     vector<int> postmenStart;
-//     for (int i = 0; i < n; i++) {
-//         postmenStart.push_back(verticesWithEdges[i]);
-//     }
+/**
+ * @brief Counts the number of valid edges in the given population of routes.
+ *
+ * This function iterates through each route in the population and counts the edges
+ * that are valid according to the adjacency matrix. An edge is considered valid if
+ * it exists in the adjacency matrix and has not been visited before in either direction.
+ *
+ * @param population A vector of routes, where each route is represented as a vector of node indices.
+ * @param adjMatrix A 2D vector representing the adjacency matrix of the graph, where adjMatrix[i][j] > 0
+ *                  indicates an edge between nodes i and j.
+ * @return The number of valid edges in the population.
+ */
+int countValidEdges(const vector<vector<int>>& population, const vector<vector<int>>& adjMatrix) {
+    int validEdges = 0;
+    vector<vector<bool>> visitedEdges(adjMatrix.size(), vector<bool>(adjMatrix.size(), false));
+    for (const auto& route : population) {
+        for (size_t i = 0; i < route.size() - 1; ++i) {
+            int from = route[i];
+            int to = route[i + 1];
+            if (adjMatrix[from][to] > 0 && !visitedEdges[from][to] && !visitedEdges[to][from]) {
+                validEdges++;
+                visitedEdges[from][to] = true;
+                visitedEdges[to][from] = true; // Mark the reverse direction as visited
+            }
+        }
+    }
+    return validEdges;
+}
 
-//     // basis for genetic algorithm
-//     vector<vector<vector<int>>> populations;
-//     vector<vector<int>> population;
-//     vector<float> fitnessScores;
-
-//     for (int gen = 0; gen < x; ++gen) {
-//         populations.clear();
-//         fitnessScores.clear();
-
-//         for (int i = 0; i < 10; ++i) {
-//             population = createPopulation(verticesWithEdges, n, getEdges());
-//             float fitness = testFitness(population);
-//             populations.push_back(population);
-//             fitnessScores.push_back(fitness);
-//         }
-
-//         pair<int, int> bestPopulations = findBestPopulations(fitnessScores, populations, n);
-//         vector<vector<int>> population1 = populations[bestPopulations.first];
-//         vector<vector<int>> population2 = populations[bestPopulations.second];
-
-//         vector<vector<int>> newPopulation = crossover(population1, population2);
-//         mutate(newPopulation, verticesWithEdges, getEdges());
-
-//         float newFitness = testFitness(newPopulation);
-//         cout << "Generation " << gen + 1 << " new population fitness: " << newFitness << endl;
-
-//         for (int i = 0; i < n; ++i) {
-//             cout << "Postman " << i + 1 << " new route: ";
-//             for (int vertex : newPopulation[i]) {
-//                 cout << vertex << " ";
-//             }
-//             cout << endl;
-//         }
-
-//         populations.push_back(newPopulation);
-//         fitnessScores.push_back(newFitness);
-//     }
-// }
-
+/**
+ * @brief Solves the Chinese Postman Problem using a genetic algorithm.
+ * 
+ * This function attempts to find an optimal solution for the Chinese Postman Problem
+ * by simulating a genetic algorithm over a specified number of generations.
+ * 
+ * @param n The number of postmen.
+ * @param x The number of generations.
+ * 
+ * The function performs the following steps:
+ * 1. Shuffles the vertices and selects starting points for each postman.
+ * 2. Creates an initial population of possible solutions.
+ * 3. Evaluates the fitness of the initial population.
+ * 4. Iteratively generates new populations through crossover and mutation, 
+ *    selecting the best population based on fitness.
+ * 5. Prints the fitness and routes of the first and last generations.
+ * 6. Calculates and prints the accuracy and correctness of the final solution.
+ * 7. Saves the results to a JSON file.
+ * 
+ * The fitness of a population is evaluated using the `testFitness` function.
+ * The population is evolved using the `createPopulation`, `crossover`, and `mutate` functions.
+ * The final results are saved to a file named "resultsGenetic.json".
+ */
 void Graph::solveGenetic(int n, int x) { // number of postmen, number of generations
-    vector<int> verticesWithEdges = shuffeledVertices(adjMatrix, getVertices());
+    vector<int> verticesWithEdges = shuffeledVertices(getVertices());
     if (n > verticesWithEdges.size()) {
         cerr << "Number of postmen cannot be greater than the number of vertices." << endl;
         return;
@@ -169,7 +266,17 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
     vector<vector<int>> population = createPopulation(verticesWithEdges, n, getEdges());
     float fitness = testFitness(population);
 
-    for (int gen = 0; gen < x; ++gen) {
+    // Print first generation
+    cout << "Generation 1 fitness: " << fitness << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << "Postman " << i + 1 << " route: ";
+        for (int vertex : population[i]) {
+            cout << vertex << " ";
+        }
+        cout << endl;
+    }
+
+    for (int gen = 1; gen < x; ++gen) {
         vector<vector<int>> newPopulation = createPopulation(verticesWithEdges, n, getEdges());
         float newFitness = testFitness(newPopulation);
 
@@ -178,20 +285,11 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
             fitness = newFitness;
         }
 
-        cout << "Generation " << gen + 1 << " fitness: " << fitness << endl;
-        for (int i = 0; i < n; ++i) {
-            cout << "Postman " << i + 1 << " route: ";
-            for (int vertex : population[i]) {
-                cout << vertex << " ";
-            }
-            cout << endl;
-        }
-
         if (gen < x - 1) {
             vector<vector<int>> population1 = population;
             vector<vector<int>> population2 = createPopulation(verticesWithEdges, n, getEdges());
 
-            vector<vector<int>> crossoverPopulation = crossover(population1, population2);
+            vector<vector<int>> crossoverPopulation = crossover(population1, population2,getSeed());
             mutate(crossoverPopulation, verticesWithEdges, getEdges());
 
             float crossoverFitness = testFitness(crossoverPopulation);
@@ -201,8 +299,68 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
             }
         }
     }
+
+    // Print last generation
+    cout << "Generation " << x << " fitness: " << fitness << endl;
+    int totalEdgesLastGen = 0;
+    for (int i = 0; i < n; ++i) {
+        cout << "Postman " << i + 1 << " route: ";
+        for (int vertex : population[i]) {
+            cout << vertex << " ";
+        }
+        totalEdgesLastGen += population[i].size() - 1; // Count edges in the route
+        cout << endl;
+    }
+
+    float accuracy = 1; 
+    accuracy = (float)getEdges() / (float)totalEdgesLastGen; 
+    cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
+    cout << "Total edges in last generation: " << totalEdgesLastGen << endl;
+    // cout << "get Edges: " << getEdges() << endl;
+
+    int validEdges = countValidEdges(population, adjMatrix);
+    cout << "Number of valid edges in the solution: " << validEdges << endl;
+    cout << "Correctness: " << ( (float)validEdges / (float)getEdges() ) * 100 << "%" << endl;
+
+    // Save results to JSON
+    json result;
+    for (int i = 0; i < n; ++i) {
+        json postmanData;
+        for (int j = 0; j < population[i].size() - 1; ++j) {
+            postmanData.push_back({population[i][j], population[i][j + 1]});
+        }
+        result["postmen"][i] = {
+            {"routes", postmanData},
+            {"cost", testFitness(population)}
+        };
+    }
+
+
+    ofstream file("resultsGenetic.json");
+    if (file.is_open()) {
+        file << result.dump();
+        file.close();
+        cout << "Results saved to resultsGenetic.json" << endl;
+    } else {
+        cerr << "Unable to open file for writing." << endl;
+    }
+
+
 }
 
+/**
+ * @brief Finds the best and second best populations based on their fitness scores.
+ *
+ * This function identifies the populations with the highest and second highest fitness scores
+ * from the given fitness scores and populations. It prints the fitness scores and the routes
+ * of the best and second best populations for each postman.
+ *
+ * @param fitnessScores A vector of fitness scores for each population.
+ * @param populations A vector of populations, where each population is a vector of routes,
+ *                    and each route is a vector of vertices.
+ * @param n The number of postmen (routes) in each population.
+ * @return A pair of integers representing the indices of the best and second best populations.
+ */
 pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std::vector<std::vector<std::vector<int>>> &populations, int n)
 {
     // Find the population with the best fitness score
@@ -218,7 +376,7 @@ pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std
     vector<vector<int>> secondBestPopulation = populations[secondBestPopulationIndex];
     *maxFitnessIt = bestFitness; // Restore the best fitness score
 
-    cout << "Best population fitness: " << bestFitness << endl;
+    cout << "Best population fitness: " << bestFitness << endl;   commented for test
     cout << "Best population: " << bestPopulationIndex + 1 << endl;
 
     for (int i = 0; i < n; ++i)
@@ -231,10 +389,10 @@ pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std
         cout << endl;
     }
 
-    cout << "Second best population fitness: " << *secondMaxFitnessIt << endl;
-    cout << "Second best population: " << secondBestPopulationIndex + 1 << endl;
+    cout << "Second best population fitness: " << *secondMaxFitnessIt << endl;  test
+    cout << "Second best population: " << secondBestPopulationIndex + 1 << endl; // test
 
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)  
     {
         cout << "Postman " << i + 1 << " second best route: ";
         for (int vertex : secondBestPopulation[i])
