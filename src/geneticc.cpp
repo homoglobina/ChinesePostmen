@@ -81,6 +81,41 @@ float Graph::testFitness(vector<vector<int>> route){
 // }
 
 
+vector<vector<int>> crossover(const vector<vector<int>>& population1, const vector<vector<int>>& population2) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(0, population1.size() - 1);
+
+    vector<vector<int>> newPopulation(population1.size());
+
+    for (int i = 0; i < population1.size(); ++i) {
+        int crossoverPoint = dist(gen);
+        for (int j = 0; j < crossoverPoint; ++j) {
+            newPopulation[i].push_back(population1[i][j]);
+        }
+        for (int j = crossoverPoint; j < population2[i].size(); ++j) {
+            newPopulation[i].push_back(population2[i][j]);
+        }
+    }
+
+    return newPopulation;
+}
+
+
+
+void mutate(vector<vector<int>>& population, const vector<int>& verticesWithEdges, int totalEdges) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(0, population.size() - 1);
+    uniform_int_distribution<> dist2(0, totalEdges - 1);
+    uniform_int_distribution<> dist3(0, verticesWithEdges.size() - 1);
+
+    int postman = dist(gen);
+    int route = dist2(gen);
+    int vertex = dist3(gen);
+
+    population[postman][route] = verticesWithEdges[vertex];
+    }
 
 
 void Graph::solveGenetic(int n){ // number of postmen
@@ -129,6 +164,19 @@ void Graph::solveGenetic(int n){ // number of postmen
 
     
 
+    vector<vector<int>> newPopulation = crossover(population1, population2);
+    mutate(newPopulation, verticesWithEdges, getEdges());
+
+    float newFitness = testFitness(newPopulation);
+    cout << "New population fitness: " << newFitness << endl;
+
+    for (int i = 0; i < n; ++i) {
+        cout << "Postman " << i + 1 << " new route: ";
+        for (int vertex : newPopulation[i]) {
+            cout << vertex << " ";
+        }
+        cout << endl;
+    }
 
 
     // Find the two populations with the best fitness
