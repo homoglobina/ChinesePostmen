@@ -29,6 +29,10 @@ public:
     std::vector<std::pair<int,int>> findEuler();
     std::vector<int> dijkstra(int start);
     std::vector<int> reconstructShortestPath(int start, int end, const std::vector<int>& dist);
+
+
+    void geneticAlgorithm(int n, int generations, int populationSize, double mutationRate);
+
 };
 
 std::vector<int> dijkstra2(int start, int end, const std::vector<std::vector<int>>& adjMatrix, int vertices);

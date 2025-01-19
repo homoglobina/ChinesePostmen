@@ -12,21 +12,32 @@ int main(int argc, char* argv[]) { //  ./genJsonTests 123 5 0.7 (seed,number_of_
     double saturation = 0.5;
     unsigned int seed = random_device{}(); 
 
-    if (argc > 1) {
-        seed = static_cast<unsigned int>(stoi(argv[1]));
+    if (argc < 3){
+        cout << "Usage: " << argv[0] << " [seed] [vertices] [saturation]" << endl;
+        return 1;
     }
-    if (argc > 2) {
-        v = stoi(argv[2]);
-    } else {
-        cout << "Enter the number of vertices: ";
-        cin >> v;
-    }
-    if (argc > 3) {
-        saturation = stod(argv[3]);
-    } else {
-        cout << "Enter the saturation (0.0 to 1.0): ";
-        cin >> saturation;
-    }
+    seed = static_cast<unsigned int>(stoi(argv[1]));
+    v = stoi(argv[2]);
+    saturation = stod(argv[3]);
+
+
+
+
+    // if (argc > 1) {
+    //     seed = static_cast<unsigned int>(stoi(argv[1]));
+    // }
+    // if (argc > 2) {
+    //     v = stoi(argv[2]);
+    // } else {
+    //     cout << "Enter the number of vertices: ";
+    //     cin >> v;
+    // }
+    // if (argc > 3) {
+    //     saturation = stod(argv[3]);
+    // } else {
+    //     cout << "Enter the saturation (0.0 to 1.0): ";
+    //     cin >> saturation;
+    // }
 
     int totalEdges = v * (v - 1) / 2;
     int targetEdges = static_cast<int>(saturation * totalEdges);

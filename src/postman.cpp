@@ -15,14 +15,9 @@ using namespace std;
 
 void Graph::solveChinesePostman(int n) {
     vector<vector<int>> localAdjMatrix = adjMatrix;
-
     makeGraphEulerian();
-
     auto eulerCycle = findEulerCycle();
-    
-
     vector<pair<int,int>> eulerCycle2;
-
 
     for (const auto& edge : eulerCycle) {
         if (localAdjMatrix[edge.second][edge.first] == 1){
@@ -38,14 +33,11 @@ void Graph::solveChinesePostman(int n) {
         }
     }
 
-
-    cout << "\nEulerEND" << ": ";
-    for (const auto& edge : eulerCycle2) {
-        cout << "(" << edge.first << ", " << edge.second << ") ";
-    }
-    cout << endl;
-
-
+    // cout << "\nEulerEND" << ": ";
+    // for (const auto& edge : eulerCycle2) {
+    //     cout << "(" << edge.first << ", " << edge.second << ") ";
+    // }
+    // cout << endl;
 
     int totalEdges = eulerCycle2.size();
     int edgesPerPostman = totalEdges / n;
@@ -76,8 +68,6 @@ void Graph::solveChinesePostman(int n) {
         totalCost += calculateCycleCost(postmenRoutes[i]);
     }
     cout << "Total cost: " << totalCost << endl;
-
-
     json result;
 
     for (int i = 0; i < n; ++i) {
@@ -161,9 +151,6 @@ int Graph::calculateCycleCost(const std::vector<std::pair<int, int>>& cycle) {
     }
     return totalCost;
 }
-
-
-
 
 std::vector<std::pair<int, int>> Graph::findEulerCycle() {
     std::vector<std::pair<int, int>> eulerCycle;
