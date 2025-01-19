@@ -27,8 +27,10 @@ int main(int argc, char* argv[]) {
 
     // graph.solveAnts(3);
 
+    int gen = 100;
+    std::cout << "Enter the number of generations: "; std::cin >> gen;
 
-    graph.solveGenetic(numPostmen, 10);
+    graph.solveGenetic(numPostmen, gen);
 
 
 }
