@@ -313,7 +313,16 @@ void Graph::solveGenetic(int n, int x) { // number of postmen, number of generat
     }
 
     float accuracy = 1; 
-    accuracy = (float)getEdges() / (float)totalEdgesLastGen; 
+    if (getEdges() > totalEdgesLastGen){
+        accuracy = (float)totalEdgesLastGen / (float)getEdges() ;
+    }
+    else {
+        accuracy = (float)getEdges() / (float)totalEdgesLastGen; 
+    }
+
+    
+    
+    
     cout << "Accuracy: " << accuracy * 100 <<"%"<< endl;
     cout << "Total edges in last generation: " << totalEdgesLastGen << endl;
     // cout << "get Edges: " << getEdges() << endl;
@@ -376,7 +385,7 @@ pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std
     vector<vector<int>> secondBestPopulation = populations[secondBestPopulationIndex];
     *maxFitnessIt = bestFitness; // Restore the best fitness score
 
-    cout << "Best population fitness: " << bestFitness << endl;   commented for test
+    cout << "Best population fitness: " << bestFitness << endl;   
     cout << "Best population: " << bestPopulationIndex + 1 << endl;
 
     for (int i = 0; i < n; ++i)
@@ -389,7 +398,7 @@ pair<int, int> Graph::findBestPopulations(std::vector<float> &fitnessScores, std
         cout << endl;
     }
 
-    cout << "Second best population fitness: " << *secondMaxFitnessIt << endl;  test
+    cout << "Second best population fitness: " << *secondMaxFitnessIt << endl;  
     cout << "Second best population: " << secondBestPopulationIndex + 1 << endl; // test
 
     for (int i = 0; i < n; ++i)  

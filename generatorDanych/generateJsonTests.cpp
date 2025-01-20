@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) { //  ./genJsonTests 123 5 0.7 (seed,number_of_
     if (outFile.is_open()) {
         outFile << graphJson.dump(); 
         outFile.close();
-        cout << "Graph saved to graphTest.json" << endl;
+        cout << "Graph saved to graphTest" << filNr <<".json" << endl;
     } else {
         cerr << "Failed to open file for writing." << endl;
     }
