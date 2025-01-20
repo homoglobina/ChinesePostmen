@@ -233,6 +233,5 @@ std::vector<std::pair<int, int>> Graph::findEulerCycle() {
             }
         }
     }
-
     return eulerCycle;
 }
