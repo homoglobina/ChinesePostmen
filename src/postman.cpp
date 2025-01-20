@@ -211,7 +211,6 @@ std::vector<std::pair<int, int>> Graph::findEulerCycle() {
     std::vector<std::pair<int, int>> eulerCycle;
     std::stack<int> stack;
     std::vector<std::vector<int>> localAdjMatrix = adjMatrix; 
-
     stack.push(0); 
     while (!stack.empty()) {
         int u = stack.top();
